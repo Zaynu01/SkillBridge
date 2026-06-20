@@ -9,6 +9,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init:/docker-entrypoint-initdb.d
+  
+  pipeline:
+    build:
+      context: ./pipeline
+    container_name: skillbridge_pipeline
+    env_file:
+      - .env
+    volumes:
+      - ./pipeline/src:/app/src
+      - ./data:/app/data
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:
