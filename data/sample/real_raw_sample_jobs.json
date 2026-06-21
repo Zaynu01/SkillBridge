@@ -1,0 +1,114 @@
+[
+  {
+    "source_name": "linkedin",
+    "source_url": "https://www.linkedin.com/jobs/view/4430018168/",
+    "scraped_at": "2026-06-21T22:16:57.632817+00:00",
+    "raw_payload": {
+      "job_id": "4430018168",
+      "title": "Data Analyst/Engineer",
+      "company": "SharpAtoms",
+      "location": "United States",
+      "posted_time_text": "2 days ago",
+      "applicants_text": "Over 200 applicants",
+      "description_html": "<div class=\"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden\">\n<p><strong>About the Role:</strong></p><p>We are building a massive pool of sharp, data-driven analysts for several upcoming enterprise data projects. We need individuals who can step into messy data environments, clean up the noise, and turn raw numbers into clear dashboards and actionable insights that drive real corporate strategy.</p><p><br/></p><p><strong>What you will do:</strong></p><ul><li>Extract, clean, and analyze complex datasets from various corporate sources.</li><li>Build, maintain, and optimize clear dashboards (SQL, PowerBI, Tableau, or Excel).</li><li>Identify trends and translate technical data into straightforward business summaries.</li></ul><p><br/></p><p><strong>What we look for:</strong></p><ul><li>Absolute mastery of SQL and data visualization tools.</li><li>Strong logical reasoning, mathematical baseline, and attention to detail.</li><li>Ability to clearly explain data findings to technical and non-technical teams.</li></ul><p><br/></p><p><strong>How to Apply:</strong></p><ol><li>Click <strong>Easy Apply</strong>.</li><li><strong>Follow our company page</strong> to track our ongoing project pipeline.</li></ol>\n</div>",
+      "description_text": "About the Role: We are building a massive pool of sharp, data-driven analysts for several upcoming enterprise data projects. We need individuals who can step into messy data environments, clean up the noise, and turn raw numbers into clear dashboards and actionable insights that drive real corporate strategy. What you will do: Extract, clean, and analyze complex datasets from various corporate sources. Build, maintain, and optimize clear dashboards (SQL, PowerBI, Tableau, or Excel). Identify trends and translate technical data into straightforward business summaries. What we look for: Absolute mastery of SQL and data visualization tools. Strong logical reasoning, mathematical baseline, and attention to detail. Ability to clearly explain data findings to technical and non-technical teams. How to Apply: Click Easy Apply . Follow our company page to track our ongoing project pipeline.",
+      "criteria": {
+        "seniority_level": "Mid-Senior level",
+        "employment_type": "Contract",
+        "job_function": "Analyst, Engineering, and Information Technology",
+        "industries": "Technology, Information and Internet"
+      },
+      "canonical_url": "https://www.linkedin.com/jobs/view/data-analyst-engineer-at-sharpatoms-4430018168",
+      "linkedin_url": "https://www.linkedin.com/jobs/view/4430018168/",
+      "og_title": "SharpAtoms hiring Data Analyst/Engineer in United States | LinkedIn",
+      "og_description": "Posted 6:09:31 PM. About the Role:We are building a massive pool of sharp, data-driven analysts for several upcoming…See this and similar jobs on LinkedIn.",
+      "title_id": "340",
+      "company_id": "80013312",
+      "html_size": 270912
+    }
+  },
+  {
+    "source_name": "linkedin",
+    "source_url": "https://www.linkedin.com/jobs/view/4430343018/",
+    "scraped_at": "2026-06-21T22:17:01.567584+00:00",
+    "raw_payload": {
+      "job_id": "4430343018",
+      "title": "Data Scientist, Early Career",
+      "company": "Jobright.ai",
+      "location": "United States",
+      "posted_time_text": "7 hours ago",
+      "applicants_text": "Be among the first 25 applicants",
+      "description_html": "<div class=\"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden\">\n<p>Jobright is your personal AI job search agent that transforms the job search process into a fast, expert-guided journey. They are seeking an AI Engineer to build and scale business-facing AI agents, managing the entire lifecycle from prototype to production.</p><p><br/></p><p><strong>Why Join Us</strong></p><p><br/></p><ul><li>Build real, production AI agents used by real users</li><li>High ownership and impact</li><li>Work at the intersection of AI, agents, and product</li><li>Shape how people experience AI-driven job search</li></ul><p><br/></p><p><strong>Responsibilities</strong></p><p><br/></p><ul><li>Develop and deploy predictive models and machine learning algorithms that power the core logic of our production AI agents</li><li>Experiment with and optimize Large Language Model (LLM) prompts, fine-tuning techniques, and RAG pipelines to improve agent performance and reliability</li><li>Perform deep-dive statistical analysis on user interaction data to identify patterns that drive product improvements and feature innovation</li><li>Monitor model performance and provide technical support during critical product iteration cycles</li></ul><p><br/></p><p><strong>Qualification</strong></p><p><br/></p><p>Required</p><p><br/></p><ul><li>Recent graduate or entry-level professional (0–2 years of experience) with a degree in Data Science, Computer Science, Statistics, or a related quantitative field</li><li>Strong programming skills in Python and proficiency with machine learning libraries such as PyTorch, TensorFlow, or Scikit-learn</li><li>Practical understanding of LLM architectures, prompt engineering, and the evaluation of generative AI outputs</li><li>Excellent communication skills with the ability to articulate technical methodology and complex modeling results to the broader team</li><li>Must live in and be authorized to work in the United States</li></ul><p><br/></p><p>Preferred</p><p><br/></p><ul><li>Previous internship or research experience focused on Natural Language Processing (NLP), autonomous agents, or recommendation systems</li><li>Experience building and maintaining data pipelines and working with cloud infrastructure (AWS/GCP/Azure)</li><li>Strong technical foundation in SQL and database management for efficient data extraction and feature engineering</li></ul>\n</div>",
+      "description_text": "Jobright is your personal AI job search agent that transforms the job search process into a fast, expert-guided journey. They are seeking an AI Engineer to build and scale business-facing AI agents, managing the entire lifecycle from prototype to production. Why Join Us Build real, production AI agents used by real users High ownership and impact Work at the intersection of AI, agents, and product Shape how people experience AI-driven job search Responsibilities Develop and deploy predictive models and machine learning algorithms that power the core logic of our production AI agents Experiment with and optimize Large Language Model (LLM) prompts, fine-tuning techniques, and RAG pipelines to improve agent performance and reliability Perform deep-dive statistical analysis on user interaction data to identify patterns that drive product improvements and feature innovation Monitor model performance and provide technical support during critical product iteration cycles Qualification Required Recent graduate or entry-level professional (0–2 years of experience) with a degree in Data Science, Computer Science, Statistics, or a related quantitative field Strong programming skills in Python and proficiency with machine learning libraries such as PyTorch, TensorFlow, or Scikit-learn Practical understanding of LLM architectures, prompt engineering, and the evaluation of generative AI outputs Excellent communication skills with the ability to articulate technical methodology and complex modeling results to the broader team Must live in and be authorized to work in the United States Preferred Previous internship or research experience focused on Natural Language Processing (NLP), autonomous agents, or recommendation systems Experience building and maintaining data pipelines and working with cloud infrastructure (AWS/GCP/Azure) Strong technical foundation in SQL and database management for efficient data extraction and feature engineering",
+      "criteria": {
+        "seniority_level": "Entry level",
+        "employment_type": "Full-time",
+        "job_function": "Engineering",
+        "industries": "Software Development"
+      },
+      "canonical_url": "https://www.linkedin.com/jobs/view/data-scientist-early-career-at-jobright-ai-4430343018",
+      "linkedin_url": "https://www.linkedin.com/jobs/view/4430343018/",
+      "og_title": "Jobright.ai hiring Data Scientist, Early Career in United States | LinkedIn",
+      "og_description": "Posted 2:20:09 PM. Jobright is your personal AI job search agent that transforms the job search process into a fast…See this and similar jobs on LinkedIn.",
+      "title_id": "25190",
+      "company_id": "91390405",
+      "html_size": 270990
+    }
+  },
+  {
+    "source_name": "linkedin",
+    "source_url": "https://www.linkedin.com/jobs/view/4428899744/",
+    "scraped_at": "2026-06-21T22:17:05.459819+00:00",
+    "raw_payload": {
+      "job_id": "4428899744",
+      "title": "Data Scientist",
+      "company": "Healthcare Fraud Shield",
+      "location": "United States",
+      "posted_time_text": "6 days ago",
+      "applicants_text": "Over 200 applicants",
+      "description_html": "<div class=\"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden\">\n<p><strong>Job Requirements:</strong></p><ul><li>Provide technical contributions in a fast-paced R&amp;D team environment to accelerate our efforts on building new analytics.</li><li>Utilize advanced mathematical models, machine learning algorithms, operations research techniques, and strong business acumen to deliver insight, recommendations, and solutions.</li><li>Analyze data sets and develop models to predict fraud, waste, and abuse.</li><li>Document and present results to internal team members for development and inclusion in company products and analysis.</li><li>Satisfies all applicable requirements imposed by applicable Company customers, clients, or business partners, with respect to the relationship and role.</li><li>Understands and complies with all company Privacy and Security standards.</li><li>This job requires access to confidential and sensitive information, requiring ongoing discretion and secure information management.</li></ul><p><br/></p><p><strong>Knowledge, Skills, &amp; Abilities:</strong></p><ul><li>Strong in mathematics and statistics</li><li>Experience coding and modeling using Python</li><li>Experience with SQL</li><li>Strong language skills, with the ability to develop and implement natural language prompts for prompt engineering applications</li><li>Strong business aptitude, the ability to rapidly learn new problem domains, and become conversant in the subject matter with team members</li></ul><p><br/></p><p><strong>Nice to Haves:</strong></p><ul><li>Experience with machine learning technology (i.e. TensorFlow, Keras or similar).</li><li>Experience working with large data sets independently.</li></ul><p><br/></p><p><strong>Benefits:</strong></p><ul><li>Medical, Dental &amp; Vision insurance</li><li>401(k) retirement savings with employer match vesting immediately</li><li>Vacation and sick paid time off</li><li>7 paid holidays &amp; 2 floating holidays</li><li>Paid maternity/paternity leave</li><li>Disability &amp; Life insurance</li><li>Flexible Spending Account (FSA)</li><li>Employee Assistance Program (EAP)</li><li>Free on-site fitness center</li><li>Professional and career development initiatives</li><li>Remote work eligible</li></ul><p><br/></p><p><strong>REMOTE WORK REQUIREMENTS:</strong></p><ul><li>Must have high speed Internet (satellite is not allowed for this role) with a minimum speed of 25mbs download and 5mbs upload.</li></ul><p><br/></p><p><em>Healthcare Fraud Shield is an equal opportunity employer that is committed to diversity, and values the ways in which we are different. All qualified applicants will receive consideration for employment without regard to race, color, religion, sex, sexual orientation, gender identity, national origin, disability, veteran status, or other characteristic protected by applicable law</em></p>\n</div>",
+      "description_text": "Job Requirements: Provide technical contributions in a fast-paced R&D team environment to accelerate our efforts on building new analytics. Utilize advanced mathematical models, machine learning algorithms, operations research techniques, and strong business acumen to deliver insight, recommendations, and solutions. Analyze data sets and develop models to predict fraud, waste, and abuse. Document and present results to internal team members for development and inclusion in company products and analysis. Satisfies all applicable requirements imposed by applicable Company customers, clients, or business partners, with respect to the relationship and role. Understands and complies with all company Privacy and Security standards. This job requires access to confidential and sensitive information, requiring ongoing discretion and secure information management. Knowledge, Skills, & Abilities: Strong in mathematics and statistics Experience coding and modeling using Python Experience with SQL Strong language skills, with the ability to develop and implement natural language prompts for prompt engineering applications Strong business aptitude, the ability to rapidly learn new problem domains, and become conversant in the subject matter with team members Nice to Haves: Experience with machine learning technology (i.e. TensorFlow, Keras or similar). Experience working with large data sets independently. Benefits: Medical, Dental & Vision insurance 401(k) retirement savings with employer match vesting immediately Vacation and sick paid time off 7 paid holidays & 2 floating holidays Paid maternity/paternity leave Disability & Life insurance Flexible Spending Account (FSA) Employee Assistance Program (EAP) Free on-site fitness center Professional and career development initiatives Remote work eligible REMOTE WORK REQUIREMENTS: Must have high speed Internet (satellite is not allowed for this role) with a minimum speed of 25mbs download and 5mbs upload. Healthcare Fraud Shield is an equal opportunity employer that is committed to diversity, and values the ways in which we are different. All qualified applicants will receive consideration for employment without regard to race, color, religion, sex, sexual orientation, gender identity, national origin, disability, veteran status, or other characteristic protected by applicable law",
+      "criteria": {
+        "seniority_level": "Entry level",
+        "employment_type": "Full-time",
+        "job_function": "Information Technology",
+        "industries": "Software Development, Hospitals and Health Care, and Insurance"
+      },
+      "canonical_url": "https://www.linkedin.com/jobs/view/data-scientist-at-healthcare-fraud-shield-4428899744",
+      "linkedin_url": "https://www.linkedin.com/jobs/view/4428899744/",
+      "og_title": "Healthcare Fraud Shield hiring Data Scientist in United States | LinkedIn",
+      "og_description": "Posted 6:06:07 PM. Job Requirements:Provide technical contributions in a fast-paced R&amp;D team environment to accelerate…See this and similar jobs on LinkedIn.",
+      "title_id": "25190",
+      "company_id": "2526367",
+      "html_size": 280934
+    }
+  },
+  {
+    "source_name": "linkedin",
+    "source_url": "https://www.linkedin.com/jobs/view/4430055958/",
+    "scraped_at": "2026-06-21T22:17:10.461560+00:00",
+    "raw_payload": {
+      "job_id": "4430055958",
+      "title": "Part-Time Data Entry Clerk",
+      "company": "Prism Data Consulting",
+      "location": "United States",
+      "posted_time_text": "1 day ago",
+      "applicants_text": "Over 200 applicants",
+      "description_html": "<div class=\"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden\">\n          Prism Data Consulting's mission is to help data professionals see opportunities from every angle to find their best fit. We are not a staffing firm or agency. Prism does not hire for these roles—we analyze and verify them from employers seeking data expertise.<br/><br/>Employer Industry: Data and Technology in Agriculture and Energy<br/><br/><strong>Why Consider This Job Opportunity<br/><br/></strong><ul><li> Pay is $15.00 per hour</li><li> Opportunity for part-time work with flexible hours</li><li> Work in a dynamic environment that values clarity, trust, and action</li><li> Engage with a team of problem-solvers and industry experts</li><li> Contribute to critical industries that impact global markets</li><li> Gain experience in data management and operational decision-making<br/><br/></li></ul><strong>What To Expect (Job Responsibilities)<br/><br/></strong><ul><li> Gather grain prices from elevators, feed mills, ethanol plants, and other grain buyers in the U.S. and Canada</li><li> Input up to 800 bids per day accurately into Excel and the database</li><li> Double-check all work for accuracy and consistency</li><li> Email out-of-range bids and communicate necessary changes</li><li> Perform additional research as requested by supervisors<br/><br/></li></ul><strong>What Is Required (Qualifications)<br/><br/></strong><ul><li> High School Diploma or currently working toward graduation</li><li> Basic computer skills, including proficiency in Microsoft Office and databases</li><li> Good written and verbal communication skills</li><li> Ability to work efficiently within a specified time frame</li><li> Attention to detail and accuracy in data entry<br/><br/></li></ul><strong>How To Stand Out (Preferred Qualifications)<br/><br/></strong><ul><li> Previous experience in data entry or a similar role</li><li> Familiarity with the agriculture industry or grain markets</li><li> Strong analytical skills for data interpretation</li><li> Ability to work independently and manage time effectively</li><li> Experience with Excel and data management software<br/><br/></li></ul>#DataEntry #Agriculture #PartTimeJob #CareerOpportunity #Teamwork<br/><br/>We prioritize candidate privacy and champion equal-opportunity employment. Central to our mission is our partnership with companies that share this commitment. We aim to foster a fair, transparent, and secure hiring environment for all. If you encounter any employer not adhering to these principles, please bring it to our attention immediately.<br/><br/>We are not the EOR (Employer of Record) for this position. Our role in this specific opportunity is to connect outstanding candidates with a top-tier employer.<br/><br/>#PrismDataConsulting\n        </div>",
+      "description_text": "Prism Data Consulting's mission is to help data professionals see opportunities from every angle to find their best fit. We are not a staffing firm or agency. Prism does not hire for these roles—we analyze and verify them from employers seeking data expertise. Employer Industry: Data and Technology in Agriculture and Energy Why Consider This Job Opportunity Pay is $15.00 per hour Opportunity for part-time work with flexible hours Work in a dynamic environment that values clarity, trust, and action Engage with a team of problem-solvers and industry experts Contribute to critical industries that impact global markets Gain experience in data management and operational decision-making What To Expect (Job Responsibilities) Gather grain prices from elevators, feed mills, ethanol plants, and other grain buyers in the U.S. and Canada Input up to 800 bids per day accurately into Excel and the database Double-check all work for accuracy and consistency Email out-of-range bids and communicate necessary changes Perform additional research as requested by supervisors What Is Required (Qualifications) High School Diploma or currently working toward graduation Basic computer skills, including proficiency in Microsoft Office and databases Good written and verbal communication skills Ability to work efficiently within a specified time frame Attention to detail and accuracy in data entry How To Stand Out (Preferred Qualifications) Previous experience in data entry or a similar role Familiarity with the agriculture industry or grain markets Strong analytical skills for data interpretation Ability to work independently and manage time effectively Experience with Excel and data management software #DataEntry #Agriculture #PartTimeJob #CareerOpportunity #Teamwork We prioritize candidate privacy and champion equal-opportunity employment. Central to our mission is our partnership with companies that share this commitment. We aim to foster a fair, transparent, and secure hiring environment for all. If you encounter any employer not adhering to these principles, please bring it to our attention immediately. We are not the EOR (Employer of Record) for this position. Our role in this specific opportunity is to connect outstanding candidates with a top-tier employer. #PrismDataConsulting",
+      "criteria": {
+        "seniority_level": "Entry level",
+        "employment_type": "Part-time",
+        "job_function": "Administrative",
+        "industries": "Administrative and Support Services"
+      },
+      "canonical_url": "https://www.linkedin.com/jobs/view/part-time-data-entry-clerk-at-prism-data-consulting-4430055958",
+      "linkedin_url": "https://www.linkedin.com/jobs/view/4430055958/",
+      "og_title": "Prism Data Consulting hiring Part-Time Data Entry Clerk in United States | LinkedIn",
+      "og_description": "Posted 8:04:28 AM. Prism Data Consulting&#39;s mission is to help data professionals see opportunities from every angle to…See this and similar jobs on LinkedIn.",
+      "title_id": "3508",
+      "company_id": "2936562",
+      "html_size": 294228
+    }
+  }
+]
