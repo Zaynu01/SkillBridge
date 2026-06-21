@@ -6,6 +6,7 @@ venv/
 
 data/raw/*
 data/processed/*
+data/sample/source_inspection/*.html
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
