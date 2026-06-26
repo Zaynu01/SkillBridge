@@ -133,15 +133,20 @@ def parse_country(location_text: str | None) -> str | None:
     """
     Parse a basic country value from location text.
 
-    This is intentionally simple for now.
+    This function is intentionally rule-based.
+
+    Why:
+    LinkedIn locations are often inconsistent.
 
     Examples:
         "United States" -> "United States"
+        "New York, NY" -> "United States"
+        "San Francisco, CA" -> "United States"
+        "Washington DC-Baltimore Area" -> "United States"
+        "Los Angeles Metropolitan Area" -> "United States"
         "Casablanca, Morocco" -> "Morocco"
         "Paris, Île-de-France, France" -> "France"
         "Remote" -> None
-
-    We are not using a geocoder yet because that would add complexity.
     """
 
     if not location_text:
@@ -157,31 +162,63 @@ def parse_country(location_text: str | None) -> str | None:
     if lower_location in {"remote", "worldwide", "anywhere"}:
         return None
 
-    # If location is comma-separated, the country is usually the last part.
-    if "," in normalized:
-        parts = [part.strip() for part in normalized.split(",") if part.strip()]
-        if parts:
-            return parts[-1]
-
-    known_countries = {
-        "united states",
-        "united kingdom",
-        "morocco",
-        "france",
-        "spain",
-        "germany",
-        "canada",
-        "india",
-        "netherlands",
-        "belgium",
-        "italy",
-        "portugal",
-        "ireland",
-        "australia",
+    known_country_names = {
+        "united states": "United States",
+        "united kingdom": "United Kingdom",
+        "morocco": "Morocco",
+        "france": "France",
+        "spain": "Spain",
+        "germany": "Germany",
+        "canada": "Canada",
+        "india": "India",
+        "netherlands": "Netherlands",
+        "belgium": "Belgium",
+        "italy": "Italy",
+        "portugal": "Portugal",
+        "ireland": "Ireland",
+        "australia": "Australia",
     }
 
-    if lower_location in known_countries:
-        return normalized
+    if lower_location in known_country_names:
+        return known_country_names[lower_location]
+
+    us_state_abbreviations = {
+        "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+        "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+        "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+        "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+        "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+        "DC",
+    }
+
+    # Handles examples like:
+    # "New York, NY"
+    # "San Francisco, CA"
+    # "Fort Worth, TX"
+    if "," in normalized:
+        parts = [part.strip() for part in normalized.split(",") if part.strip()]
+        last_part = parts[-1] if parts else ""
+
+        if last_part.upper() in us_state_abbreviations:
+            return "United States"
+
+        # If the last part is an actual country name, use it.
+        last_part_lower = last_part.lower()
+        if last_part_lower in known_country_names:
+            return known_country_names[last_part_lower]
+
+    us_metro_signals = [
+        "metropolitan area",
+        "greater",
+        "washington dc",
+        "washington dc-baltimore",
+        "new york city",
+        "bay area",
+        "silicon valley",
+    ]
+
+    if any(signal in lower_location for signal in us_metro_signals):
+        return "United States"
 
     return None
 
