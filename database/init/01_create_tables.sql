@@ -313,65 +313,57 @@ CREATE TABLE IF NOT EXISTS bronze.raw_job_postings (
 -- ------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS silver.job_postings (
-    -- Auto-generated unique identifier for each cleaned job.
     job_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
     -- Link back to the raw bronze record.
-    -- Nullable because in rare cases a cleaned record may be loaded
-    -- from a trusted manual or external source later.
-    raw_job_id BIGINT,
+    raw_job_id BIGINT NOT NULL,
 
-    -- Clean standardized job title.
-    title TEXT NOT NULL,
+    -- Link back to the pipeline run that loaded the bronze record.
+    pipeline_run_id BIGINT,
 
-    -- Clean standardized company name.
-    company TEXT,
-
-    -- Clean standardized location.
-    location TEXT,
-
-    -- Clean standardized job description.
-    description TEXT NOT NULL,
-
-    -- Standardized posting date if it can be parsed.
-    -- Some raw sources may have relative dates like "2 days ago",
-    -- so this can be NULL when unknown.
-    posting_date DATE,
-
-    -- Source name carried from bronze.
+    -- Source identity fields.
     source_name TEXT NOT NULL,
-
-    -- Source URL carried from bronze if available.
+    source_job_id TEXT NOT NULL,
     source_url TEXT,
 
-    -- Timestamp when the job was cleaned.
+    -- Cleaned job fields.
+    job_title TEXT NOT NULL,
+    company_name TEXT,
+    location_text TEXT,
+    country TEXT,
+    remote_type TEXT,
+
+    -- Source-provided job metadata.
+    employment_type TEXT,
+    seniority_level TEXT,
+    job_function TEXT,
+    industries TEXT,
+
+    -- Text fields used later for role detection, student-fit detection,
+    -- and skill extraction.
+    posted_time_text TEXT,
+    applicants_text TEXT,
+    description_text TEXT NOT NULL,
+    description_html TEXT,
+
+    -- Timestamps.
+    scraped_at TIMESTAMPTZ,
     cleaned_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    -- Row creation timestamp.
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    -- Row update timestamp.
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    -- Link silver job to its raw bronze record.
-    -- ON DELETE SET NULL preserves the cleaned silver job even if
-    -- the raw record is deleted, but removes the broken reference.
     CONSTRAINT fk_silver_job_raw_job
         FOREIGN KEY (raw_job_id)
         REFERENCES bronze.raw_job_postings(raw_job_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_silver_job_pipeline_run
+        FOREIGN KEY (pipeline_run_id)
+        REFERENCES metadata.pipeline_runs(pipeline_run_id)
         ON DELETE SET NULL,
 
-    -- Prevent duplicate cleaned jobs from the same source URL.
-    --
-    -- Important PostgreSQL detail:
-    -- UNIQUE allows multiple NULL values. So if source_url is NULL,
-    -- this does not fully prevent duplicates.
-    --
-    -- For this MVP, this is acceptable because most scraped jobs
-    -- should have URLs. Later, we can add source_record_id or
-    -- silver-level content_hash if needed.
-    CONSTRAINT uq_silver_job_source
-        UNIQUE (source_name, source_url)
+    CONSTRAINT uq_silver_job_source_job
+        UNIQUE (source_name, source_job_id)
 );
 
 
