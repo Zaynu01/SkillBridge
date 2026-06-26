@@ -209,12 +209,29 @@ def parse_country(location_text: str | None) -> str | None:
 
     us_metro_signals = [
         "metropolitan area",
-        "greater",
+        "metroplex",
+        "greater chicago area",
+        "greater new york city area",
+        "greater boston",
+        "greater seattle",
+        "greater los angeles",
+        "greater houston",
+        "greater atlanta",
+        "greater phoenix",
+        "greater denver",
+        "greater miami",
+        "greater minneapolis-st. paul",
         "washington dc",
         "washington dc-baltimore",
         "new york city",
         "bay area",
+        "san francisco bay area",
         "silicon valley",
+        "los angeles metropolitan area",
+        "atlanta metropolitan area",
+        "dallas-fort worth",
+        "dallas fort worth",
+        "dallas-fort worth metroplex",
     ]
 
     if any(signal in lower_location for signal in us_metro_signals):
