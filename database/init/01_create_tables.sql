@@ -540,7 +540,6 @@ CREATE TABLE IF NOT EXISTS silver.job_skills (
 --
 -- This table stores derived information:
 -- - detected role
--- - seniority level
 -- - junior friendliness
 -- - detected language
 -- - analysis notes
@@ -551,57 +550,61 @@ CREATE TABLE IF NOT EXISTS silver.job_skills (
 -- ------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS silver.job_analysis (
-    -- Same ID as silver.job_postings.job_id.
-    -- This means one job has at most one analysis row.
     job_id BIGINT PRIMARY KEY,
 
-    -- Detected role.
-    -- Example: "Data Engineer", "BI Analyst", "Data Scientist"
-    role TEXT,
+    -- Normalized role category used for grouping jobs in analytics.
+    detected_role TEXT NOT NULL,
 
-    -- Detected seniority level.
-    -- Default is "Unknown" because we should not guess when the
-    -- title/description does not provide enough evidence.
-    seniority_level TEXT NOT NULL DEFAULT 'Unknown',
+    -- Method used to produce the analysis.
+    -- For now this will usually be: rule_based
+    analysis_method TEXT NOT NULL DEFAULT 'rule_based',
 
-    -- Whether the job appears suitable for a junior/student profile.
-    junior_friendly BOOLEAN DEFAULT FALSE,
+    -- Confidence score from the role detection logic.
+    -- This is not an ML probability; it is a rule-strength score.
+    confidence_score NUMERIC(5, 2),
 
-    -- Optional detected language.
-    -- Example: "en", "fr", "unknown"
-    detected_language TEXT,
+    -- Human-readable explanation of why the role was selected.
+    role_reason TEXT,
 
-    -- Optional notes from the analysis logic.
-    -- Example: "No seniority keyword found"
-    analysis_notes TEXT,
+    -- Lightweight data quality flag.
+    -- Used to exclude obvious non-entry-level jobs from skill demand analysis.
+    is_excluded_from_analysis BOOLEAN NOT NULL DEFAULT FALSE,
 
-    -- Timestamp when analysis was created.
+    -- Explanation for exclusion.
+    -- Example: senior keyword in title: senior
+    exclusion_reason TEXT,
+
     analyzed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    -- Timestamp when analysis was last updated.
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    -- Link analysis to cleaned job.
-    -- If the job is deleted, its analysis is deleted too.
     CONSTRAINT fk_job_analysis_job
         FOREIGN KEY (job_id)
         REFERENCES silver.job_postings(job_id)
         ON DELETE CASCADE,
 
-    -- Restrict seniority values to the allowed categories.
-    -- This matches the project rule-based seniority design.
-    CONSTRAINT chk_seniority_level
+    CONSTRAINT chk_detected_role
         CHECK (
-            seniority_level IN (
-                'Internship',
-                'Junior',
-                'Intermediate',
-                'Senior',
-                'Unknown'
+            detected_role IN (
+                'data_analyst',
+                'data_engineer',
+                'bi_analyst',
+                'data_scientist',
+                'machine_learning_engineer',
+                'analytics_engineer',
+                'other',
+                'unknown'
+            )
+        ),
+
+    CONSTRAINT chk_analysis_method
+        CHECK (
+            analysis_method IN (
+                'rule_based',
+                'ai_assisted',
+                'manual_review'
             )
         )
 );
-
 
 
 -- ============================================================
