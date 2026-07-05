@@ -467,7 +467,8 @@ CREATE TABLE IF NOT EXISTS silver.skill_aliases (
 -- silver.job_skills
 -- ------------------------------------------------------------
 --
--- Many-to-many relationship between jobs and skills.
+-- Many-to-many relationship between cleaned job postings and
+-- canonical skills.
 --
 -- One job can require many skills.
 -- One skill can appear in many jobs.
@@ -480,44 +481,95 @@ CREATE TABLE IF NOT EXISTS silver.skill_aliases (
 -- BI Analyst Intern    -> SQL
 -- BI Analyst Intern    -> Power BI
 --
+-- This table stores only final validated/normalized skills.
+--
+-- With the updated AI-assisted extraction approach:
+--
+-- - The AI reads the job description.
+-- - The AI extracts and normalizes skills.
+-- - Python validates the AI output.
+-- - New canonical skills are inserted into silver.skills if needed.
+-- - The final job-skill relationship is stored here.
+--
+-- Example:
+--
+-- raw mention in description: "Postgres"
+-- normalized skill:          "PostgreSQL"
+--
+-- raw mention in description: "PowerBI"
+-- normalized skill:          "Power BI"
+--
 -- ------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS silver.job_skills (
     -- Cleaned job identifier.
+    -- Links this extracted skill to one row in silver.job_postings.
     job_id BIGINT NOT NULL,
 
     -- Canonical skill identifier.
+    -- Links to the normalized skill in silver.skills.
     skill_id BIGINT NOT NULL,
 
-    -- Where the skill was detected from.
-    -- Example: "description", "title", "requirements_section"
-    detected_from TEXT DEFAULT 'description',
+    -- Method used to extract the skill.
+    --
+    -- For the next implementation step, this will usually be "ai".
+    --
+    -- Possible values:
+    -- - ai: extracted by AI-assisted skill extraction
+    -- - rule_based: extracted by regex/dictionary rules
+    -- - manual: manually inserted or corrected
+    extraction_method TEXT NOT NULL DEFAULT 'ai',
 
-    -- Optional confidence score.
-    -- For regex/dictionary matching, this can be NULL or 1.0.
-    -- If later you use fuzzy matching or embeddings, this becomes useful.
+    -- Original text found in the job description before normalization.
+    --
+    -- Examples:
+    -- - "Postgres"          -> PostgreSQL
+    -- - "PowerBI"           -> Power BI
+    -- - "Apache Airflow"    -> Airflow
+    -- - "PySpark"           -> Spark
+    --
+    -- This is useful for debugging and for building alias memory later.
+    raw_mention TEXT,
+
+    -- Optional confidence score returned by the extraction method.
+    --
+    -- For AI extraction, this can store the model's confidence.
+    -- For rule-based extraction, it can be 1.0.
+    --
+    -- Must be between 0 and 1 when provided.
     confidence_score NUMERIC(5, 4),
 
     -- Row creation timestamp.
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     -- Composite primary key.
-    -- This prevents the same skill being attached to the same job twice.
+    -- This prevents the same skill from being attached to the same job twice.
     PRIMARY KEY (job_id, skill_id),
 
-    -- Link to cleaned job.
-    -- If a job is deleted, its job-skill links are deleted.
+    -- Link to the cleaned job posting.
+    -- If a job is deleted, its extracted skills are deleted too.
     CONSTRAINT fk_job_skills_job
         FOREIGN KEY (job_id)
         REFERENCES silver.job_postings(job_id)
         ON DELETE CASCADE,
 
-    -- Link to canonical skill.
-    -- If a skill is deleted, its job-skill links are deleted.
+    -- Link to the canonical skill.
+    -- If a skill is deleted, related job-skill links are deleted too.
     CONSTRAINT fk_job_skills_skill
         FOREIGN KEY (skill_id)
         REFERENCES silver.skills(skill_id)
         ON DELETE CASCADE,
+
+    -- Restrict extraction method to a controlled list.
+    -- This keeps the table clean and avoids values like "AI", "gpt", "model", etc.
+    CONSTRAINT chk_job_skills_extraction_method
+        CHECK (
+            extraction_method IN (
+                'ai',
+                'rule_based',
+                'manual'
+            )
+        ),
 
     -- Confidence score must be between 0 and 1 when provided.
     CONSTRAINT chk_skill_confidence_score
@@ -529,7 +581,6 @@ CREATE TABLE IF NOT EXISTS silver.job_skills (
             )
         )
 );
-
 
 
 -- ------------------------------------------------------------
@@ -674,17 +725,17 @@ CREATE INDEX IF NOT EXISTS idx_raw_job_postings_ingested_at
 CREATE INDEX IF NOT EXISTS idx_silver_job_postings_raw_job_id
     ON silver.job_postings(raw_job_id);
 
--- Speeds up searches/filtering by title.
-CREATE INDEX IF NOT EXISTS idx_silver_job_postings_title
-    ON silver.job_postings(title);
+-- Speeds up filtering/searching jobs by cleaned job title.
+CREATE INDEX IF NOT EXISTS idx_silver_job_postings_job_title
+    ON silver.job_postings(job_title);
 
--- Speeds up searches/filtering by company.
-CREATE INDEX IF NOT EXISTS idx_silver_job_postings_company
-    ON silver.job_postings(company);
+-- Speeds up filtering/searching jobs by company name.
+CREATE INDEX IF NOT EXISTS idx_silver_job_postings_company_name
+    ON silver.job_postings(company_name);
 
--- Speeds up searches/filtering by location.
-CREATE INDEX IF NOT EXISTS idx_silver_job_postings_location
-    ON silver.job_postings(location);
+-- Speeds up filtering/searching jobs by cleaned location text.
+CREATE INDEX IF NOT EXISTS idx_silver_job_postings_location_text
+    ON silver.job_postings(location_text);
 
 -- Speeds up filtering cleaned jobs by source.
 CREATE INDEX IF NOT EXISTS idx_silver_job_postings_source_name
@@ -694,14 +745,22 @@ CREATE INDEX IF NOT EXISTS idx_silver_job_postings_source_name
 CREATE INDEX IF NOT EXISTS idx_silver_skills_skill_name
     ON silver.skills(skill_name);
 
--- Speeds up alias lookup during skill normalization.
+-- Speeds up alias lookup during normalization.
 CREATE INDEX IF NOT EXISTS idx_silver_skill_aliases_alias_name
     ON silver.skill_aliases(alias_name);
 
--- Speeds up dbt/dashboard queries by role.
-CREATE INDEX IF NOT EXISTS idx_silver_job_analysis_role
-    ON silver.job_analysis(role);
+-- Speeds up joining job_skills to job_postings.
+CREATE INDEX IF NOT EXISTS idx_silver_job_skills_job_id
+    ON silver.job_skills(job_id);
 
--- Speeds up dbt/dashboard queries by seniority level.
-CREATE INDEX IF NOT EXISTS idx_silver_job_analysis_seniority
-    ON silver.job_analysis(seniority_level);
+-- Speeds up joining job_skills to skills.
+CREATE INDEX IF NOT EXISTS idx_silver_job_skills_skill_id
+    ON silver.job_skills(skill_id);
+
+-- Speeds up dbt/dashboard queries by detected role.
+CREATE INDEX IF NOT EXISTS idx_silver_job_analysis_detected_role
+    ON silver.job_analysis(detected_role);
+
+-- Speeds up dbt/dashboard queries that exclude senior/irrelevant jobs.
+CREATE INDEX IF NOT EXISTS idx_silver_job_analysis_excluded
+    ON silver.job_analysis(is_excluded_from_analysis);
