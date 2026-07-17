@@ -1,0 +1,12 @@
+skillbridge_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('POSTGRES_HOST', 'postgres') }}"
+      user: "{{ env_var('POSTGRES_USER', 'skillbridge') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'skillbridge') }}"
+      port: "{{ env_var('POSTGRES_PORT', '5432') | int }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'skillbridge_db') }}"
+      schema: public
+      threads: 4

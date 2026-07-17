@@ -91,6 +91,9 @@ CANONICAL_SKILL_OVERRIDES = {
     "Microsoft Azure": "Azure",
     "Data Build Tool": "dbt",
     "DBT": "dbt",
+    "AI": "Artificial Intelligence",
+    "A.I.": "Artificial Intelligence",
+    "Database": "Databases",
 }
 
 
@@ -175,6 +178,27 @@ CATEGORY_OVERRIDES = {
     "Workflow Automation": "Automation",
     "Process Automation": "Automation",
 }
+
+SKILL_CATEGORY_OVERRIDES = {
+    "SQL": "Database",
+    "Databases": "Database",
+    "Microsoft Access": "Database",
+    "Oracle": "Database",
+
+    "Artificial Intelligence": "Machine Learning",
+
+    "Power BI": "Data Visualization",
+    "Tableau": "Data Visualization",
+    "Looker": "Data Visualization",
+    "Google Analytics": "Data Visualization",
+
+    "Python": "Programming",
+    "R": "Programming",
+    "NumPy": "Programming",
+
+    "Excel": "Spreadsheet",
+}
+
 
 # Skills/phrases that should not become canonical technical skills.
 # This protects the dashboard from vague or soft-skill pollution.
@@ -359,20 +383,21 @@ def normalize_skill_name(skill_name: str) -> str:
     return override_map.get(lookup_key, cleaned)
 
 
-def normalize_skill_category(category: str | None) -> str:
+def normalize_skill_category(
+    skill_name: str,
+    category: str | None,
+) -> str:
     """
     Normalize and validate a skill category.
 
-    The AI is asked to choose from ALLOWED_SKILL_CATEGORIES.
-    However, if it returns a close variant such as:
-        - Query Language
-        - Business Intelligence
-        - Cloud Data Warehouse
-
-    we map it back to our controlled category list.
-
-    If the final category is still unknown, we store it as Other Technical.
+    Priority:
+    1. If this is an obvious known skill, use its fixed category.
+    2. Otherwise normalize the AI category using CATEGORY_OVERRIDES.
+    3. If still invalid, use Other Technical.
     """
+
+    if skill_name in SKILL_CATEGORY_OVERRIDES:
+        return SKILL_CATEGORY_OVERRIDES[skill_name]
 
     cleaned = normalize_whitespace(category)
 
@@ -504,7 +529,10 @@ def validate_and_normalize_skill_item(item: dict[str, Any]) -> ExtractedSkill | 
     if is_rejected_skill_name(skill_name):
         return None
 
-    skill_category = normalize_skill_category(item.get("skill_category"))
+    skill_category = normalize_skill_category(
+                        skill_name=skill_name,
+                        category=item.get("skill_category"),
+                    )
 
     raw_mention = normalize_whitespace(item.get("raw_mention"))
 
@@ -646,6 +674,17 @@ Return:
 - skill_name: "Tableau", raw_mention: "Tableau"
 - skill_name: "Power BI", raw_mention: "Power BI"
 - skill_name: "Looker", raw_mention: "Looker"
+
+Normalize these names consistently:
+- AI -> Artificial Intelligence
+- A.I. -> Artificial Intelligence
+- Database -> Databases
+- Databases -> Databases
+
+Classify:
+- SQL as Database
+- Databases as Database
+- Artificial Intelligence as Machine Learning 
 
 Job title:
 {job_title}

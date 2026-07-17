@@ -1,0 +1,17 @@
+name: skillbridge_dbt
+version: "1.0.0"
+config-version: 2
+
+profile: skillbridge_dbt
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+
+models:
+  skillbridge_dbt:
+    staging:
+      +schema: staging
+      +materialized: view
+    marts:
+      +schema: gold
+      +materialized: table

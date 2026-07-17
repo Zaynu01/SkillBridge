@@ -1,0 +1,22 @@
+SELECT
+    job_id,
+    raw_job_id,
+    pipeline_run_id,
+    source_name,
+    source_job_id,
+    source_url,
+    job_title,
+    company_name,
+    location_text,
+    country,
+    remote_type,
+    employment_type,
+    seniority_level,
+    job_function,
+    industries,
+    posted_time_text,
+    applicants_text,
+    description_text,
+    scraped_at,
+    cleaned_at
+FROM silver.job_postings
