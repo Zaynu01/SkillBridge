@@ -1,0 +1,158 @@
+version: 2
+
+models:
+  # ==========================================================
+  # Job postings
+  # ==========================================================
+  - name: stg_job_postings
+    description: >
+      Clean job posting records read from silver.job_postings.
+      Each row represents one canonical source job.
+
+    columns:
+      - name: job_id
+        description: Primary identifier of the silver job.
+        tests:
+          - not_null
+          - unique
+
+      - name: raw_job_id
+        description: Link to the original bronze record.
+        tests:
+          - not_null
+
+      - name: source_name
+        description: Source from which the job was collected.
+        tests:
+          - not_null
+
+      - name: source_job_id
+        description: Job identifier supplied by the source.
+        tests:
+          - not_null
+
+      - name: job_title
+        tests:
+          - not_null
+
+      - name: description_text
+        tests:
+          - not_null
+
+
+  # ==========================================================
+  # Job analysis
+  # ==========================================================
+  - name: stg_job_analysis
+    description: >
+      Role detection and exclusion results for silver jobs.
+
+    columns:
+      - name: job_id
+        description: One analysis record should exist per job.
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('stg_job_postings')
+              field: job_id
+
+      - name: detected_role
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - data_analyst
+                - data_engineer
+                - bi_analyst
+                - data_scientist
+                - machine_learning_engineer
+                - analytics_engineer
+                - other
+                - unknown
+
+      - name: analysis_method
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - rule_based
+                - ai_assisted
+                - manual_review
+
+      - name: is_excluded_from_analysis
+        tests:
+          - not_null
+
+
+  # ==========================================================
+  # Canonical skills
+  # ==========================================================
+  - name: stg_skills
+    description: >
+      Canonical normalized skills and their approved categories.
+
+    columns:
+      - name: skill_id
+        tests:
+          - not_null
+          - unique
+
+      - name: skill_name
+        tests:
+          - not_null
+          - unique
+
+      - name: skill_category
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Programming
+                - Database
+                - Spreadsheet
+                - Data Visualization
+                - Data Engineering
+                - Data Warehousing
+                - Orchestration
+                - Cloud
+                - DevOps
+                - Version Control
+                - Machine Learning
+                - Statistics
+                - Data Management
+                - Automation
+                - Other Technical
+
+
+  # ==========================================================
+  # Job-skill relationships
+  # ==========================================================
+  - name: stg_job_skills
+    description: >
+      Many-to-many relationships between jobs and their
+      extracted canonical skills.
+
+    columns:
+      - name: job_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_job_postings')
+              field: job_id
+
+      - name: skill_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_skills')
+              field: skill_id
+
+      - name: extraction_method
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - ai
+                - rule_based
+                - manual

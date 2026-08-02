@@ -1,0 +1,201 @@
+version: 2
+
+models:
+  # ==========================================================
+  # Market overview
+  # ==========================================================
+  - name: mart_market_overview
+    description: >
+      One-row summary containing the main dashboard KPIs.
+
+    columns:
+      - name: total_jobs
+        tests:
+          - not_null
+
+      - name: total_companies
+        tests:
+          - not_null
+
+      - name: total_sources
+        tests:
+          - not_null
+
+      - name: total_detected_roles
+        tests:
+          - not_null
+
+      - name: analyzable_jobs
+        tests:
+          - not_null
+
+      - name: excluded_jobs
+        tests:
+          - not_null
+
+      - name: total_skills
+        tests:
+          - not_null
+
+      - name: total_job_skill_links
+        tests:
+          - not_null
+
+      - name: built_at
+        tests:
+          - not_null
+
+
+  # ==========================================================
+  # Top skills by role
+  # ==========================================================
+  - name: mart_top_skills_by_role
+    description: >
+      Skill demand metrics and rankings for each detected role.
+
+    columns:
+      - name: detected_role
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - data_analyst
+                - data_engineer
+                - bi_analyst
+                - data_scientist
+                - machine_learning_engineer
+                - analytics_engineer
+
+      - name: skill_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_skills')
+              field: skill_id
+
+      - name: skill_name
+        tests:
+          - not_null
+
+      - name: skill_category
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Programming
+                - Database
+                - Spreadsheet
+                - Data Visualization
+                - Data Engineering
+                - Data Warehousing
+                - Orchestration
+                - Cloud
+                - DevOps
+                - Version Control
+                - Machine Learning
+                - Statistics
+                - Data Management
+                - Automation
+                - Other Technical
+
+      - name: jobs_with_skill
+        tests:
+          - not_null
+
+      - name: total_jobs_for_role
+        tests:
+          - not_null
+
+      - name: demand_percentage
+        tests:
+          - not_null
+
+      - name: skill_rank
+        tests:
+          - not_null
+
+
+  # ==========================================================
+  # Skills by category
+  # ==========================================================
+  - name: mart_skills_by_category
+    description: >
+      Aggregated skill and job counts for each skill category.
+
+    columns:
+      - name: skill_category
+        tests:
+          - not_null
+          - unique
+          - accepted_values:
+              values:
+                - Programming
+                - Database
+                - Spreadsheet
+                - Data Visualization
+                - Data Engineering
+                - Data Warehousing
+                - Orchestration
+                - Cloud
+                - DevOps
+                - Version Control
+                - Machine Learning
+                - Statistics
+                - Data Management
+                - Automation
+                - Other Technical
+
+      - name: distinct_skills_count
+        tests:
+          - not_null
+
+      - name: jobs_with_category
+        tests:
+          - not_null
+
+      - name: job_skill_links
+        tests:
+          - not_null
+
+
+  # ==========================================================
+  # Job explorer
+  # ==========================================================
+  - name: mart_job_explorer
+    description: >
+      One dashboard-ready row per job, including role,
+      exclusion information, and aggregated skill names.
+
+    columns:
+      - name: job_id
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('stg_job_postings')
+              field: job_id
+
+      - name: job_title
+        tests:
+          - not_null
+
+      - name: detected_role
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - data_analyst
+                - data_engineer
+                - bi_analyst
+                - data_scientist
+                - machine_learning_engineer
+                - analytics_engineer
+                - other
+                - unknown
+
+      - name: is_excluded_from_analysis
+        tests:
+          - not_null
+
+      # skill_names is intentionally not tested as not_null.
+      # Vague job descriptions can legitimately have no skills.
