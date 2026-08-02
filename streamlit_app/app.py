@@ -83,6 +83,44 @@ def safe_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df.fillna("")
 
 
+def deduplicate_skill_names(values) -> list[str]:
+    """
+    Remove case-only duplicates while preserving a readable display name.
+
+    Examples:
+        ["Pandas", "pandas"] -> ["Pandas"]
+        ["NumPy", "numpy"]   -> ["NumPy"]
+    """
+
+    skills_by_key: dict[str, str] = {}
+
+    for value in values:
+        if pd.isna(value):
+            continue
+
+        skill_name = str(value).strip()
+
+        if not skill_name:
+            continue
+
+        comparison_key = skill_name.casefold()
+
+        if comparison_key not in skills_by_key:
+            skills_by_key[comparison_key] = skill_name
+            continue
+
+        existing_name = skills_by_key[comparison_key]
+
+        # Prefer a nicely capitalized value over an all-lowercase value.
+        if existing_name.islower() and not skill_name.islower():
+            skills_by_key[comparison_key] = skill_name
+
+    return sorted(
+        skills_by_key.values(),
+        key=str.casefold,
+    )
+
+
 # ============================================================
 # Load gold marts
 # ============================================================
@@ -148,7 +186,7 @@ st.sidebar.write("Data source: dbt gold marts")
 # App title
 # ============================================================
 
-st.title("📊 SkillBridge Dashboard")
+st.title("SkillBridge Dashboard")
 st.caption(
     "Analyze entry-level data job postings, demanded skills, and student skill gaps."
 )
@@ -503,8 +541,8 @@ with tab_gap:
             .copy()
         )
 
-        all_skill_options = sorted(
-            top_skills_by_role["skill_name"].dropna().unique()
+        all_skill_options = deduplicate_skill_names(
+            top_skills_by_role["skill_name"]
         )
 
         current_skills = st.multiselect(
@@ -512,11 +550,37 @@ with tab_gap:
             all_skill_options,
         )
 
-        required_skills = set(role_top_skills["skill_name"])
-        current_skill_set = set(current_skills)
+        # Map lowercase comparison keys to readable canonical names.
+        required_skill_map = {
+            str(skill_name).strip().casefold(): str(skill_name).strip()
+            for skill_name in role_top_skills["skill_name"]
+            if pd.notna(skill_name)
+        }
 
-        matched_skills = sorted(required_skills.intersection(current_skill_set))
-        missing_skills = sorted(required_skills.difference(current_skill_set))
+        current_skill_keys = {
+            str(skill_name).strip().casefold()
+            for skill_name in current_skills
+        }
+
+        matched_skills = sorted(
+            [
+                display_name
+                for comparison_key, display_name in required_skill_map.items()
+                if comparison_key in current_skill_keys
+            ],
+            key=str.casefold,
+        )
+
+        missing_skills = sorted(
+            [
+                display_name
+                for comparison_key, display_name in required_skill_map.items()
+                if comparison_key not in current_skill_keys
+            ],
+            key=str.casefold,
+        )
+
+        required_skills = set(required_skill_map.values())
 
         if required_skills:
             coverage = round(

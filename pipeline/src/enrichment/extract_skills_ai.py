@@ -813,17 +813,51 @@ def upsert_skill(
     skill: ExtractedSkill,
 ) -> int:
     """
-    Insert a canonical skill if it does not exist.
+    Reuse an existing canonical skill case-insensitively.
 
     Category rule:
     - New skill: use the validated AI category.
     - Existing skill: keep the existing database category.
     - Existing skill with NULL category: fill it.
-
-    This prevents category flip-flopping.
+    Rules:
+    - "Pandas" and "pandas" reuse the same skill_id.
+    - Existing category remains stable.
+    - A category is filled only when the stored category is NULL or empty.
+    - A genuinely new skill is inserted.
     """
 
-    query = """
+    existing_skill = fetch_skill_by_name_case_insensitive(
+        connection=connection,
+        skill_name=skill.skill_name,
+    )
+
+    if existing_skill is not None:
+        skill_id = int(existing_skill["skill_id"])
+
+        # Fill the category only if the existing value is NULL or empty.
+        update_query = """
+            UPDATE silver.skills
+            SET
+                skill_category = COALESCE(
+                    NULLIF(skill_category, ''),
+                    %(skill_category)s
+                ),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE skill_id = %(skill_id)s;
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                update_query,
+                {
+                    "skill_id": skill_id,
+                    "skill_category": skill.skill_category,
+                },
+            )
+
+        return skill_id
+
+    insert_query = """
         INSERT INTO silver.skills (
             skill_name,
             skill_category
@@ -832,19 +866,12 @@ def upsert_skill(
             %(skill_name)s,
             %(skill_category)s
         )
-        ON CONFLICT (skill_name)
-        DO UPDATE SET
-            skill_category = COALESCE(
-                NULLIF(silver.skills.skill_category, ''),
-                EXCLUDED.skill_category
-            ),
-            updated_at = CURRENT_TIMESTAMP
         RETURNING skill_id;
     """
 
     with connection.cursor() as cursor:
         result = cursor.execute(
-            query,
+            insert_query,
             {
                 "skill_name": skill.skill_name,
                 "skill_category": skill.skill_category,
@@ -852,6 +879,44 @@ def upsert_skill(
         ).fetchone()
 
     return int(result["skill_id"])
+
+
+def fetch_skill_by_name_case_insensitive(
+    connection: psycopg.Connection,
+    skill_name: str,
+) -> dict | None:
+    """
+    Find an existing canonical skill without considering letter case.
+
+    Examples:
+        Incoming "pandas" matches existing "Pandas".
+        Incoming "NUMPY" matches existing "NumPy".
+        Incoming "sql" matches existing "SQL".
+    """
+
+    cleaned_skill_name = normalize_whitespace(skill_name)
+
+    if not cleaned_skill_name:
+        return None
+
+    query = """
+        SELECT
+            skill_id,
+            skill_name,
+            skill_category
+        FROM silver.skills
+        WHERE LOWER(TRIM(skill_name)) =
+              LOWER(TRIM(%(skill_name)s))
+        LIMIT 1;
+    """
+
+    with connection.cursor() as cursor:
+        result = cursor.execute(
+            query,
+            {"skill_name": cleaned_skill_name},
+        ).fetchone()
+
+    return result
 
 
 def is_safe_alias(raw_mention: str | None, skill_name: str) -> bool:
