@@ -1,0 +1,35 @@
+{
+  "location": "United States",
+  "max_urls_per_search": 200,
+  "offset_step": 20,
+  "max_pages": 30,
+  "delay_seconds": 3,
+  "max_consecutive_no_new": 2,
+  "output_dir": "data/batches/balanced_01",
+  "searches": [
+    {
+      "name": "data_analyst",
+      "keywords": "data analyst"
+    },
+    {
+      "name": "bi_analyst",
+      "keywords": "business intelligence analyst"
+    },
+    {
+      "name": "data_engineer",
+      "keywords": "data engineer"
+    },
+    {
+      "name": "analytics_engineer",
+      "keywords": "analytics engineer"
+    },
+    {
+      "name": "data_scientist",
+      "keywords": "data scientist"
+    },
+    {
+      "name": "machine_learning_engineer",
+      "keywords": "machine learning engineer"
+    }
+  ]
+}

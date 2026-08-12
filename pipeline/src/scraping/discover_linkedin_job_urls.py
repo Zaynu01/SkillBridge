@@ -29,6 +29,7 @@ import re
 import time
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit
+import json
 
 import requests
 from bs4 import BeautifulSoup
@@ -57,6 +58,8 @@ REQUEST_HEADERS = {
     "Accept-Language": "en-US,en;q=0.9,fr;q=0.8",
 }
 
+LINKEDIN_SEARCH_URL = "https://www.linkedin.com/jobs/search/"
+
 
 def resolve_container_path(path_value: str) -> Path:
     """
@@ -80,6 +83,67 @@ def resolve_container_path(path_value: str) -> Path:
         return Path("/app") / path
 
     return path
+
+def load_batch_config(config_path: Path) -> dict:
+    """
+    Load and validate the LinkedIn batch-search configuration.
+    """
+
+    if not config_path.exists():
+        raise FileNotFoundError(
+            f"Batch config does not exist: {config_path}"
+        )
+
+    config = json.loads(
+        config_path.read_text(encoding="utf-8")
+    )
+
+    required_fields = {
+        "location",
+        "max_urls_per_search",
+        "offset_step",
+        "max_pages",
+        "delay_seconds",
+        "output_dir",
+        "searches",
+    }
+
+    missing_fields = required_fields - config.keys()
+
+    if missing_fields:
+        raise ValueError(
+            "Batch config is missing required fields: "
+            + ", ".join(sorted(missing_fields))
+        )
+
+    if not isinstance(config["searches"], list):
+        raise ValueError(
+            "'searches' must be a list."
+        )
+
+    if not config["searches"]:
+        raise ValueError(
+            "'searches' cannot be empty."
+        )
+
+    return config
+
+def build_linkedin_search_url(
+    keywords: str,
+    location: str,
+) -> str:
+    """
+    Build a LinkedIn search-page URL from keywords and location.
+    """
+
+    query_string = urlencode(
+        {
+            "keywords": keywords,
+            "location": location,
+        }
+    )
+
+    return f"{LINKEDIN_SEARCH_URL}?{query_string}"
 
 
 def normalize_linkedin_job_url(job_id: str) -> str:
@@ -228,24 +292,24 @@ def fetch_html(
 def save_fragment_html(
     html: str,
     start_offset: int,
+    search_name: str,
 ) -> Path:
     """
-    Save every response separately for debugging.
-
-    Example:
-
-        linkedin_start_0.html
-        linkedin_start_25.html
-        linkedin_start_50.html
+    Save one result fragment inside a directory
+    dedicated to the current search.
     """
 
-    INSPECTION_DIRECTORY.mkdir(
+    search_directory = (
+        INSPECTION_DIRECTORY / search_name
+    )
+
+    search_directory.mkdir(
         parents=True,
         exist_ok=True,
     )
 
     output_path = (
-        INSPECTION_DIRECTORY
+        search_directory
         / f"linkedin_start_{start_offset}.html"
     )
 
@@ -325,6 +389,7 @@ def discover_job_urls_across_offsets(
     max_pages: int,
     delay_seconds: float,
     max_consecutive_no_new: int = 2,
+    search_name: str = "single_search",
 ) -> list[str]:
     """
     Request several result offsets and collect unique job URLs.
@@ -406,6 +471,7 @@ def discover_job_urls_across_offsets(
             saved_path = save_fragment_html(
                 html=html,
                 start_offset=start_offset,
+                search_name=search_name,
             )
 
             print(
@@ -496,6 +562,151 @@ def discover_job_urls_across_offsets(
     return discovered_urls[:max_urls]
 
 
+def run_batch_discovery(config_path: Path) -> None:
+    config = load_batch_config(config_path)
+
+    location = config["location"]
+    default_max_urls = config["max_urls_per_search"]
+    offset_step = config["offset_step"]
+    max_pages = config["max_pages"]
+    delay_seconds = config["delay_seconds"]
+
+    max_consecutive_no_new = config.get(
+        "max_consecutive_no_new",
+        2,
+    )
+
+    output_directory = resolve_container_path(
+        config["output_dir"]
+    )
+
+    output_directory.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    searches = config["searches"]
+
+    # Used for the final report
+    batch_results = {}
+
+
+    # Remember every role-specific URL file
+    role_url_files = []
+
+    print()
+    print("=" * 72)
+    print("Starting LinkedIn batch URL discovery")
+    print("=" * 72)
+
+    # Run every configured search
+    for index, search in enumerate(
+        searches,
+        start=1,
+    ):
+        search_name = search["name"]
+        keywords = search["keywords"]
+
+        max_urls = search.get(
+            "max_urls",
+            default_max_urls,
+        )
+
+        search_url = build_linkedin_search_url(
+            keywords=keywords,
+            location=location,
+        )
+
+        output_path = (
+            output_directory
+            / f"{search_name}_urls.txt"
+        )
+
+        print()
+        print("#" * 72)
+        print(
+            f"SEARCH {index}/{len(searches)}: "
+            f"{search_name}"
+        )
+        print("#" * 72)
+
+        urls = discover_job_urls_across_offsets(
+            search_url=search_url,
+            max_urls=max_urls,
+            offset_step=offset_step,
+            max_pages=max_pages,
+            delay_seconds=delay_seconds,
+            max_consecutive_no_new=(
+                max_consecutive_no_new
+            ),
+            search_name=search_name,
+        )
+
+        # Save this particular role
+        save_urls(
+            urls=urls,
+            output_path=output_path,
+        )
+
+        # Remember the file for final combination
+        role_url_files.append(output_path)
+
+        batch_results[search_name] = len(urls)
+
+        print(
+            f"Completed {search_name}: "
+            f"{len(urls)} unique URLs"
+        )
+
+    # Combine the role-specific files
+    combined_output_path = (
+        output_directory
+        / "all_job_urls.txt"
+    )
+
+    combined_urls = combine_job_urls(
+        files=role_url_files,
+        output_path=combined_output_path,
+    )
+
+    # Batch report
+    print()
+    print("=" * 72)
+    print("Batch discovery summary")
+    print("=" * 72)
+
+    total_search_references = 0
+
+    for search_name, url_count in batch_results.items():
+        print(
+            f"{search_name:<30} {url_count:>5}"
+        )
+
+        total_search_references += url_count
+
+    print("-" * 72)
+
+    print(
+        f"{'Search references':<30} "
+        f"{total_search_references:>5}"
+    )
+
+    print(
+        f"{'Final unique jobs':<30} "
+        f"{len(combined_urls):>5}"
+    )
+
+    print(
+        f"{'Duplicates removed':<30} "
+        f"{total_search_references - len(combined_urls):>5}"
+    )
+
+    print(
+        f"Combined file: {combined_output_path}"
+    )
+
+    print("=" * 72)
+
 def save_urls(
     urls: list[str],
     output_path: Path,
@@ -542,26 +753,53 @@ def print_report(
 
     print("=" * 72)
 
+def combine_job_urls(files, output_path):
+    job_urls = set()
+
+    for file_path in files:
+        with open(file_path, "r", encoding="utf-8") as file:
+            for line in file:
+                url = line.strip()
+
+                if url:
+                    job_urls.add(url)
+
+    with open(output_path, "w", encoding="utf-8") as file:
+        for url in job_urls:
+            file.write(url + "\n")
+
+    return job_urls
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Discover LinkedIn job URLs across "
-            "multiple result offsets."
+            "Discover LinkedIn job URLs."
         )
     )
 
     parser.add_argument(
         "url",
-        help="Original LinkedIn job search URL.",
+        nargs="?",
+        help=(
+            "LinkedIn search URL for "
+            "single-search mode."
+        ),
     )
 
     parser.add_argument(
-        "--output",
-        default=str(DEFAULT_OUTPUT_URLS_PATH),
+        "--batch-config",
         help=(
-            "Output text file containing one direct "
-            "job URL per line."
+            "JSON configuration file for "
+            "batch-search mode."
+        ),
+    )
+
+    # Keep your existing arguments:
+    parser.add_argument(
+        "--output",
+        default=str(
+            DEFAULT_OUTPUT_URLS_PATH
         ),
     )
 
@@ -569,63 +807,67 @@ def main() -> None:
         "--max-urls",
         type=int,
         default=200,
-        help=(
-            "Maximum number of unique job URLs to save. "
-            "This is a ceiling, not a guaranteed result count."
-        ),
     )
 
     parser.add_argument(
         "--offset-step",
         type=int,
         default=10,
-        help=(
-            "Amount added to the start offset between requests. "
-            "This does not control how many cards are returned."
-        ),
     )
 
     parser.add_argument(
         "--max-pages",
         type=int,
-        default=20,
-        help=(
-            "Maximum number of result-fragment requests."
-        ),
+        default=30,
     )
 
     parser.add_argument(
         "--delay-seconds",
         type=float,
         default=3.0,
-        help=(
-            "Delay between requests."
-        ),
     )
 
     parser.add_argument(
         "--max-consecutive-no-new",
         type=int,
         default=2,
-        help=(
-            "Stop after this many consecutive offsets "
-            "return no new unique job URLs."
-        ),
     )
 
     args = parser.parse_args()
 
+    # ============================================
+    # Batch mode
+    # ============================================
+
+    if args.batch_config:
+        config_path = Path(
+            args.batch_config
+        )
+
+        if not config_path.is_absolute():
+            config_path = (
+                Path("/app") / config_path
+            )
+
+        run_batch_discovery(
+            config_path=config_path
+        )
+
+        return
+
+    # ============================================
+    # Single-search mode
+    # ============================================
+
+    if not args.url:
+        parser.error(
+            "Provide either a search URL "
+            "or --batch-config."
+        )
+
     output_path = resolve_container_path(
         args.output
     )
-
-    print("Starting LinkedIn URL discovery...")
-    print(f"Original search URL: {args.url}")
-    print(f"Output file: {output_path}")
-    print(f"Maximum URLs: {args.max_urls}")
-    print(f"Offset step: {args.offset_step}")
-    print(f"Maximum pages: {args.max_pages}")
-    print(f"Delay: {args.delay_seconds} seconds")
 
     urls = discover_job_urls_across_offsets(
         search_url=args.url,
@@ -636,6 +878,7 @@ def main() -> None:
         max_consecutive_no_new=(
             args.max_consecutive_no_new
         ),
+        search_name="single_search",
     )
 
     save_urls(
@@ -648,7 +891,6 @@ def main() -> None:
         urls=urls,
         output_path=output_path,
     )
-
 
 if __name__ == "__main__":
     main()
